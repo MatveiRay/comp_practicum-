@@ -1,1 +1,107 @@
+/*
+
+Райко Матвей Витальевич НБИбд-03-23
+
+Лабораторная 2, Билет 23, Задание 2
+
+2.Даны три вектора в пространстве, координаты которых определены случайным образом. 
+Найти их длины, найти попарно углы между ними, найти попарно сумму и разность векторов, 
+выяснить вопрос о том, что они не лежат в одной плоскости, есть ли параллельные среди них.
+
+*/
+
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+
+struct Vector3D {
+    double x, y, z;
+};
+
+// Генерация случайного вектора
+Vector3D generateRandomVector() {
+    return { static_cast<double>(rand() % 21 - 10),
+             static_cast<double>(rand() % 21 - 10),
+             static_cast<double>(rand() % 21 - 10) };
+}
+
+// Длина вектора
+double length(const Vector3D& v) {
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+// Угол между двумя векторами (в градусах)
+double angleBetween(const Vector3D& v1, const Vector3D& v2) {
+    double dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z; // скалярное произведение
+    return acos(dot / (length(v1) * length(v2))) * 180.0 / M_PI; // угол в градусах
+}
+
+// Сложение векторов
+Vector3D add(const Vector3D& v1, const Vector3D& v2) {
+    return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z };
+}
+
+// Вычитание векторов
+Vector3D subtract(const Vector3D& v1, const Vector3D& v2) {
+    return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+}
+
+// Проверка параллельности векторов
+bool areParallel(const Vector3D& v1, const Vector3D& v2) {
+    Vector3D cross = { v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x };
+    return cross.x == 0 && cross.y == 0 && cross.z == 0;
+}
+
+// Проверка на компланарность (через смешанное произведение)
+bool areCoplanar(const Vector3D& v1, const Vector3D& v2, const Vector3D& v3) {
+    double determinant = v1.x * (v2.y * v3.z - v2.z * v3.y)
+                       - v1.y * (v2.x * v3.z - v2.z * v3.x)
+                       + v1.z * (v2.x * v3.y - v2.y * v3.x);
+    return determinant == 0;
+}
+
+int main() {
+    srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
+
+    // Генерация трех случайных векторов
+    Vector3D v1 = generateRandomVector();
+    Vector3D v2 = generateRandomVector();
+    Vector3D v3 = generateRandomVector();
+
+    // Вывод векторов
+    std::cout << "Вектор 1: (" << v1.x << ", " << v1.y << ", " << v1.z << ")\n";
+    std::cout << "Вектор 2: (" << v2.x << ", " << v2.y << ", " << v2.z << ")\n";
+    std::cout << "Вектор 3: (" << v3.x << ", " << v3.y << ", " << v3.z << ")\n";
+
+    // Длины векторов
+    std::cout << "Длина Вектора 1: " << length(v1) << "\n";
+    std::cout << "Длина Вектора 2: " << length(v2) << "\n";
+    std::cout << "Длина Вектора 3: " << length(v3) << "\n";
+
+    // Углы между векторами
+    std::cout << "Угол между Вектором 1 и Вектором 2: " << angleBetween(v1, v2) << " градусов\n";
+    std::cout << "Угол между Вектором 1 и Вектором 3: " << angleBetween(v1, v3) << " градусов\n";
+    std::cout << "Угол между Вектором 2 и Вектором 3: " << angleBetween(v2, v3) << " градусов\n";
+
+    // Суммы векторов
+    std::cout << "Сумма Вектора 1 и Вектора 2: (" << add(v1, v2).x << ", " << add(v1, v2).y << ", " << add(v1, v2).z << ")\n";
+    std::cout << "Сумма Вектора 1 и Вектора 3: (" << add(v1, v3).x << ", " << add(v1, v3).y << ", " << add(v1, v3).z << ")\n";
+    std::cout << "Сумма Вектора 2 и Вектора 3: (" << add(v2, v3).x << ", " << add(v2, v3).y << ", " << add(v2, v3).z << ")\n";
+
+    // Разности векторов
+    std::cout << "Разность Вектора 1 и Вектора 2: (" << subtract(v1, v2).x << ", " << subtract(v1, v2).y << ", " << subtract(v1, v2).z << ")\n";
+    std::cout << "Разность Вектора 1 и Вектора 3: (" << subtract(v1, v3).x << ", " << subtract(v1, v3).y << ", " << subtract(v1, v3).z << ")\n";
+    std::cout << "Разность Вектора 2 и Вектора 3: (" << subtract(v2, v3).x << ", " << subtract(v2, v3).y << ", " << subtract(v2, v3).z << ")\n";
+
+    // Проверка параллельности
+    std::cout << "Вектор 1 и Вектор 2 параллельны? " << (areParallel(v1, v2) ? "Да" : "Нет") << "\n";
+    std::cout << "Вектор 1 и Вектор 3 параллельны? " << (areParallel(v1, v3) ? "Да" : "Нет") << "\n";
+    std::cout << "Вектор 2 и Вектор 3 параллельны? " << (areParallel(v2, v3) ? "Да" : "Нет") << "\n";
+
+    // Проверка на компланарность
+    std::cout << "Все три вектора лежат в одной плоскости? " << (areCoplanar(v1, v2, v3) ? "Да" : "Нет") << "\n";
+
+    return 0;
+}
 
