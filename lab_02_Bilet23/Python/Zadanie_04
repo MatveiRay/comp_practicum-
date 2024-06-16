@@ -1,1 +1,65 @@
+# Райко Матвей Витальевич НБИбд-03-23
+# Лабораторная 2, Билет 23, Задание 4
+
+"""
+4. Дано уравнения эллиптического цилиндра, плоскости, прямой и координата точки в пространстве, параметры которых определены случайным образом.
+Выяснить вопрос о том, пересекает ли плоскость или прямая заданный эллиптический цилиндр, принадлежит ли заданная точка эллиптическому цилиндру.
+"""
+
+import random
+import numpy as np
+
+def main():
+    # Случайные параметры эллиптического цилиндра
+    center_x = random.uniform(-10, 10)
+    center_y = random.uniform(-10, 10)
+    center_z = random.uniform(-10, 10)
+    a = random.uniform(1, 5)
+    b = random.uniform(1, 5)
+    
+    # Случайные параметры плоскости
+    A = random.uniform(-5, 5)
+    B = random.uniform(-5, 5)
+    C = random.uniform(-5, 5)
+    D = random.uniform(-20, 20)
+    
+    # Случайные параметры прямой
+    x0 = random.uniform(-10, 10)
+    y0 = random.uniform(-10, 10)
+    z0 = random.uniform(-10, 10)
+    vx = random.uniform(-5, 5)
+    vy = random.uniform(-5, 5)
+    vz = random.uniform(-5, 5)
+    
+    # Случайная точка
+    x = random.uniform(-15, 15)
+    y = random.uniform(-15, 15)
+    z = random.uniform(-15, 15)
+    
+    # Вывод параметров
+    print(f"Уравнение эллиптического цилиндра: (x - {center_x})^2 / {a**2} + (y - {center_y})^2 / {b**2} = 1, z = {center_z}")
+    print(f"Плоскость: {A}x + {B}y + {C}z + {D} = 0")
+    print(f"Прямая: точка ({x0}, {y0}, {z0}), направляющий вектор ({vx}, {vy}, {vz})")
+    print(f"Точка: ({x}, {y}, {z})")
+    
+    # Проверка пересечения плоскости и эллиптического цилиндра
+    distance_to_cylinder = np.abs(A * center_x + B * center_y + C * center_z + D) / np.sqrt(A**2 + B**2 + C**2)
+    is_intersecting = distance_to_cylinder < np.sqrt(a**2 + b**2)
+    
+    if is_intersecting:
+        print("Плоскость пересекает эллиптический цилиндр.")
+    else:
+        print("Плоскость не пересекает эллиптический цилиндр.")
+    
+    # Проверка принадлежности точки эллиптическому цилиндру
+    is_on_cylinder = np.isclose((x - center_x)**2 / a**2 + (y - center_y)**2 / b**2, 1) and np.isclose(z, center_z)
+    
+    if is_on_cylinder:
+        print("Точка принадлежит эллиптическому цилиндру.")
+    else:
+        print("Точка не принадлежит эллиптическому цилиндру.")
+
+# Запуск программы
+if __name__ == "__main__":
+    main()
 
