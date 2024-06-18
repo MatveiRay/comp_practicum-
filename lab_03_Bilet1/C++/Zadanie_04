@@ -1,0 +1,35 @@
+/*
+Райко Матвей Витальевич НБИбд-03-23.
+Лабораторная номер 3,Билет 1, Задание 4
+
+4. Численно найти сумму функционального ряда с точностью до точностью до 10^-6
+∞ Σ k=1 ((-1)^k)/sinkx+1+k^2,x∈R
+*/
+
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+double series_sum(double x, double tolerance = 1e-6) {
+    double sum = 0.0;
+    double term;
+    int k = 1;
+
+    do {
+        term = pow(-1, k) / (sin(k * x) + 1 + k * k);
+        sum += term;
+        k++;
+    } while (fabs(term) >= tolerance);
+
+    return sum;
+}
+
+int main() {
+    double x = 1.0; // Пример: x = 1
+    double result = series_sum(x);
+
+    cout << "Сумма ряда при x = " << x << " с точностью до 10^-6: " << result << endl;
+
+    return 0;
+}
