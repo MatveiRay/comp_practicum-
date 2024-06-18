@@ -1,1 +1,118 @@
+/*
+Райко Матвей Витальевич НБИбд-03-23.
+Лабораторная номер 4,Билет 12, Задание 2
+
+2. Реализовать на языках С++ и Python вычислительные алгоритмы поиска решений системы линейных алгебраических
+уравнений методом Крамера и Якоби. Система имеет следующий вид:
+5x1-2x2-x3=0
+2x1-x2-x3=-1
+2x1 - 4x2 - 8x3 = 1
+*/
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+// Функция для вычисления определителя матрицы 3x3
+double determinant3x3(const vector<vector<double>>& matrix) {
+    return matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1])
+         - matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0])
+         + matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]);
+}
+
+// Функция для решения СЛАУ методом Крамера
+vector<double> solveCramer(const vector<vector<double>>& A, const vector<double>& B) {
+    int n = A.size();
+    vector<double> solution(n);
+
+    // Вычисляем определитель матрицы коэффициентов A
+    double detA = determinant3x3(A);
+
+    // Проверяем невырожденность матрицы A
+    if (detA == 0) {
+        cout << "Матрица коэффициентов вырожденная, метод Крамера не применим." << endl;
+        return solution; // возвращаем пустой вектор, чтобы показать ошибку
+    }
+
+    // Вычисляем решения x1, x2, x3 по формулам Крамера
+    for (int i = 0; i < n; ++i) {
+        vector<vector<double>> Ai = A; // Копируем матрицу A
+        for (int j = 0; j < n; ++j) {
+            Ai[j][i] = B[j]; // Заменяем i-й столбец матрицы Ai на столбец B
+        }
+        solution[i] = determinant3x3(Ai) / detA;
+    }
+
+    return solution;
+}
+
+// Функция для решения СЛАУ методом Якоби
+vector<double> solveJacobi(const vector<vector<double>>& A, const vector<double>& B, double tolerance = 1e-6, int maxIterations = 1000) {
+    int n = A.size();
+    vector<double> x(n, 0); // Начальное приближение
+    vector<double> prevX(n, 0); // Предыдущее приближение
+
+    int iterations = 0;
+    while (iterations < maxIterations) {
+        for (int i = 0; i < n; ++i) {
+            prevX[i] = x[i]; // Сохраняем предыдущее приближение
+            double sum = 0;
+            for (int j = 0; j < n; ++j) {
+                if (j != i) {
+                    sum += A[i][j] * prevX[j];
+                }
+            }
+            x[i] = (B[i] - sum) / A[i][i]; // Вычисляем новое приближение
+        }
+
+        // Проверяем критерий останова
+        bool converged = true;
+        for (int i = 0; i < n; ++i) {
+            if (fabs(x[i] - prevX[i]) > tolerance) {
+                converged = false;
+                break;
+            }
+        }
+        if (converged) {
+            cout << "Метод Якоби сошелся за " << iterations + 1 << " итераций." << endl;
+            return x;
+        }
+
+        iterations++;
+    }
+
+    // Если не сошелся за maxIterations итераций
+    cout << "Метод Якоби не сошелся за " << maxIterations << " итераций." << endl;
+    return x; // возвращаем текущее приближение
+}
+
+int main() {
+    // Задаем матрицу коэффициентов A и вектор правых частей B
+    vector<vector<double>> A = {
+        { 5, -2, -1 },
+        { 2, -1, -1 },
+        { 2, -4, -8 }
+    };
+    vector<double> B = { 0, -1, 1 };
+
+    // Решаем СЛАУ методом Крамера
+    cout << "Решение СЛАУ методом Крамера (x1, x2, x3): ";
+    vector<double> solutionCramer = solveCramer(A, B);
+    for (size_t i = 0; i < solutionCramer.size(); ++i) {
+        cout << solutionCramer[i] << " ";
+    }
+    cout << endl;
+
+    // Решаем СЛАУ методом Якоби
+    cout << "Решение СЛАУ методом Якоби (x1, x2, x3): ";
+    vector<double> solutionJacobi = solveJacobi(A, B);
+    for (size_t i = 0; i < solutionJacobi.size(); ++i) {
+        cout << solutionJacobi[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
 
