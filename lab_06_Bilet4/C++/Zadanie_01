@@ -1,0 +1,62 @@
+/*
+Райко Матвей Витальевич НБИбд-03-23.
+Лабораторная номер 6,Билет 4, Задание 1
+
+1.Применить метод покоординатного спуска для поиска оптимума функции
+f(x) = x1^2 + 3x2^2 + cos (x1 + x2).
+*/
+
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+// Определение функции f(x1, x2)
+double f(double x1, double x2) {
+    return x1*x1 + 3*x2*x2 + cos(x1 + x2);
+}
+
+// Метод покоординатного спуска
+void coordinate_descent(double& x1, double& x2, double alpha, double epsilon, int max_iter) {
+    int iter = 0;
+    double prev_f = f(x1, x2);
+    while (iter < max_iter) {
+        // Обновление x1
+        double grad1 = 2*x1 - sin(x1 + x2);
+        x1 -= alpha * grad1;
+
+        // Обновление x2
+        double grad2 = 6*x2 - sin(x1 + x2);
+        x2 -= alpha * grad2;
+
+        // Проверка на достижение необходимой точности
+        double current_f = f(x1, x2);
+        if (abs(current_f - prev_f) < epsilon) {
+            cout << "Сходимость достигнута на итерации " << iter << endl;
+            break;
+        }
+
+        prev_f = current_f;
+        iter++;
+    }
+
+    // Вывод результата
+    cout << "Оптимальное значение функции: " << f(x1, x2) << endl;
+    cout << "Оптимальные значения x1 и x2: " << x1 << ", " << x2 << endl;
+}
+
+int main() {
+    // Начальные значения x1 и x2
+    double x1 = 0.0;
+    double x2 = 0.0;
+
+    // Параметры метода
+    double alpha = 0.1;  // скорость обучения
+    double epsilon = 1e-6;  // требуемая точность
+    int max_iter = 1000;  // максимальное количество итераций
+
+    // Вызов метода покоординатного спуска
+    coordinate_descent(x1, x2, alpha, epsilon, max_iter);
+
+    return 0;
+}
