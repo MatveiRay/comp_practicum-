@@ -1,0 +1,43 @@
+# Райко Матвей Витальевич НБИбд-03-23.
+# Лабораторная номер 6,Билет 4, Задание 2
+
+"""
+2. Применить метод наискорейшего спуска для поиска оптимума функции
+f(x)=7x1^2+2x1x2+5x2^2+x1-10x2.
+"""
+
+import numpy as np
+
+# Определим функцию вычисления f(x) и её градиента
+def f(x):
+    x1 = x[0]
+    x2 = x[1]
+    return 7*x1**2 + 2*x1*x2 + 5*x2**2 + x1 - 10*x2
+
+def grad_f(x):
+    x1 = x[0]
+    x2 = x[1]
+    df_dx1 = 14*x1 + 2*x2 + 1
+    df_dx2 = 2*x1 + 10*x2 - 10
+    return np.array([df_dx1, df_dx2])
+
+# Функция для метода наискорейшего спуска
+def gradient_descent(f, grad_f, x0, learning_rate=0.1, tolerance=1e-6, max_iterations=1000):
+    x = x0
+    iteration = 0
+    while iteration < max_iterations:
+        gradient = grad_f(x)
+        if np.linalg.norm(gradient) < tolerance:
+            print(f"Сходимость достигнута на итерации {iteration}")
+            return x
+        x = x - learning_rate * gradient
+        iteration += 1
+    print("Алгоритм не сошелся")
+    return x
+
+# Начальная точка и запуск метода наискорейшего спуска
+x0 = np.array([0.0, 0.0])
+optimum = gradient_descent(f, grad_f, x0)
+
+print("Оптимальное решение:", optimum)
+print("Оптимальное значение f(x):", f(optimum))
