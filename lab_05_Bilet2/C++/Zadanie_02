@@ -1,0 +1,67 @@
+/*
+Райко Матвей Витальевич НБИбд-03-23.
+Лабораторная номер 5,Билет 2, Задание 2
+
+2.Используя значения функции Уj= cos (xj), вычисленных в точках хj = 0.1pi, 0.2pi, 0.3pi, 0.4pi,
+построить интерполяционные многочлены Ньютона, проходящие через точки {хj,yj}.
+Вычислить значение погрешности △(y(x*)) интерполяции в точке x* = 0.25pi.
+*/
+
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+// Функция для вычисления интерполяционного многочлена Ньютона
+double newton_interpolation(double x_star, const double x[], const double y[], int n) {
+    // Вычисление коэффициентов разделенных разностей
+    double f[n][n];
+    for (int i = 0; i < n; ++i) {
+        f[i][0] = y[i];
+    }
+    for (int j = 1; j < n; ++j) {
+        for (int i = 0; i < n - j; ++i) {
+            f[i][j] = (f[i+1][j-1] - f[i][j-1]) / (x[i+j] - x[i]);
+        }
+    }
+
+    // Вычисление значения интерполяционного многочлена в точке x_star
+    double result = f[0][0];
+    double term = 1.0;
+    for (int j = 1; j < n; ++j) {
+        term *= (x_star - x[j-1]);
+        result += f[0][j] * term;
+    }
+
+    return result;
+}
+
+int main() {
+    const double pi = acos(-1.0);
+    const int n = 4;  // количество узлов интерполяции
+
+    double x[n] = {0.1 * pi, 0.2 * pi, 0.3 * pi, 0.4 * pi};
+    double y[n];
+    
+    // Вычисление значений yj = cos(xj)
+    for (int i = 0; i < n; ++i) {
+        y[i] = cos(x[i]);
+    }
+
+    // Точка x* = 0.25 * pi
+    double x_star = 0.25 * pi;
+
+    // Вычисление интерполяционного многочлена в точке x_star
+    double interpolated_value = newton_interpolation(x_star, x, y, n);
+
+    // Вычисление погрешности Δ(y(x*)) интерполяции
+    double true_value = cos(x_star);
+    double interpolation_error = true_value - interpolated_value;
+
+    // Вывод результатов
+    cout << "Значение интерполяционного многочлена в точке x* = 0.25pi: " << interpolated_value << endl;
+    cout << "Значение истинной функции в точке x* = 0.25pi: " << true_value << endl;
+    cout << "Погрешность интерполяции Δ(y(x*)) в точке x* = 0.25pi: " << interpolation_error << endl;
+
+    return 0;
+}
