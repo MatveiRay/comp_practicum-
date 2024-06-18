@@ -1,1 +1,155 @@
+/*
+Райко Матвей Витальевич НБИбд-03-23.
+Лабораторная номер 4,Билет 12, Задание 1
+
+1.Реализовать на языках С++ и Python вычислительные алгоритмы поиска решений системы линейных алгебраических уравнений матричным методом и методом Гаусса. Система имеет следующий вид:
+- x1 - 8x2 + 5x1= -60,
+6x1 - 6x2 + 2x3 + 4x1 = - 10,
+9х1 - 5х2 - 6x3 + 4x1 - 65,
+-5x1 - 9x3 + x4 = 18.
+*/
+
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+class LinearEquationSolver {
+private:
+    vector<vector<double>> A; // Матрица коэффициентов
+    vector<double> B; // Вектор правых частей
+    int n; // Размерность СЛАУ
+
+public:
+    // Конструктор, принимающий матрицу A и вектор B
+    LinearEquationSolver(const vector<vector<double>>& coefficients, const vector<double>& constants) {
+        A = coefficients;
+        B = constants;
+        n = A.size();
+    }
+
+    // Метод матричного решения СЛАУ
+    vector<double> solveMatrixMethod() {
+        vector<vector<double>> augmentedMatrix(n, vector<double>(n + 1));
+
+        // Собираем расширенную матрицу (A | B)
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                augmentedMatrix[i][j] = A[i][j];
+            }
+            augmentedMatrix[i][n] = B[i];
+        }
+
+        // Прямой ход метода Гаусса для приведения матрицы к треугольному виду
+        for (int i = 0; i < n; ++i) {
+            // Находим главный элемент для текущей строки
+            int pivot = i;
+            for (int j = i + 1; j < n; ++j) {
+                if (abs(augmentedMatrix[j][i]) > abs(augmentedMatrix[pivot][i])) {
+                    pivot = j;
+                }
+            }
+            // Обмен строк для улучшения устойчивости вычислений
+            if (pivot != i) {
+                swap(augmentedMatrix[i], augmentedMatrix[pivot]);
+            }
+
+            // Приводим текущий столбец к нулю ниже главного элемента
+            for (int j = i + 1; j < n; ++j) {
+                double ratio = augmentedMatrix[j][i] / augmentedMatrix[i][i];
+                for (int k = i; k <= n; ++k) {
+                    augmentedMatrix[j][k] -= ratio * augmentedMatrix[i][k];
+                }
+            }
+        }
+
+        // Обратный ход для нахождения решений
+        vector<double> solution(n);
+        for (int i = n - 1; i >= 0; --i) {
+            solution[i] = augmentedMatrix[i][n];
+            for (int j = i + 1; j < n; ++j) {
+                solution[i] -= augmentedMatrix[i][j] * solution[j];
+            }
+            solution[i] /= augmentedMatrix[i][i];
+        }
+
+        return solution;
+    }
+
+    // Метод решения СЛАУ методом Гаусса
+    vector<double> solveGaussMethod() {
+        vector<vector<double>> augmentedMatrix = A;
+        vector<double> augmentedB = B;
+
+        // Прямой ход метода Гаусса
+        for (int i = 0; i < n; ++i) {
+            // Находим главный элемент для текущей строки
+            int pivot = i;
+            for (int j = i + 1; j < n; ++j) {
+                if (abs(augmentedMatrix[j][i]) > abs(augmentedMatrix[pivot][i])) {
+                    pivot = j;
+                }
+            }
+            // Обмен строк для улучшения устойчивости вычислений
+            if (pivot != i) {
+                swap(augmentedMatrix[i], augmentedMatrix[pivot]);
+                swap(augmentedB[i], augmentedB[pivot]);
+            }
+
+            // Приводим текущий столбец к нулю ниже главного элемента
+            for (int j = i + 1; j < n; ++j) {
+                double ratio = augmentedMatrix[j][i] / augmentedMatrix[i][i];
+                for (int k = i; k < n; ++k) {
+                    augmentedMatrix[j][k] -= ratio * augmentedMatrix[i][k];
+                }
+                augmentedB[j] -= ratio * augmentedB[i];
+            }
+        }
+
+        // Обратный ход для нахождения решений
+        vector<double> solution(n);
+        for (int i = n - 1; i >= 0; --i) {
+            solution[i] = augmentedB[i];
+            for (int j = i + 1; j < n; ++j) {
+                solution[i] -= augmentedMatrix[i][j] * solution[j];
+            }
+            solution[i] /= augmentedMatrix[i][i];
+        }
+
+        return solution;
+    }
+};
+
+int main() {
+    // Задаем матрицу коэффициентов A и вектор правых частей B
+    vector<vector<double>> A = {
+        { 1, -8, 0, 5 },
+        { 6, -6, 2, 4 },
+        { 9, -5, -6, 4 },
+        { -5, 0, -9, 1 }
+    };
+    vector<double> B = { -60, -10, -65, 18 };
+
+    // Создаем экземпляр класса LinearEquationSolver
+    LinearEquationSolver solver(A, B);
+
+    // Решаем СЛАУ методом матриц и выводим результат
+    vector<double> solutionMatrixMethod = solver.solveMatrixMethod();
+    cout << "Решение СЛАУ методом матриц (x1, x2, x3, x4): ";
+    for (size_t i = 0; i < solutionMatrixMethod.size(); ++i) {
+        cout << solutionMatrixMethod[i] << " ";
+    }
+    cout << endl;
+
+    // Решаем СЛАУ методом Гаусса и выводим результат
+    vector<double> solutionGaussMethod = solver.solveGaussMethod();
+    cout << "Решение СЛАУ методом Гаусса (x1, x2, x3, x4): ";
+    for (size_t i = 0; i < solutionGaussMethod.size(); ++i) {
+        cout << solutionGaussMethod[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
 
